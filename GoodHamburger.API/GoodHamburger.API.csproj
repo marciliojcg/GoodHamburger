@@ -13,6 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\GoodHamburger.Application\GoodHamburger.Application.csproj" />
     <ProjectReference Include="..\GoodHamburger.Domain\GoodHamburger.Domain.csproj" />
+    <ProjectReference Include="..\GoodHamburger.Infrastructure\GoodHamburger.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

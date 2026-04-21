@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.37203.1 d17.14
+VisualStudioVersion = 17.14.37203.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoodHamburger.Domain", "GoodHamburger.Domain\GoodHamburger.Domain.csproj", "{63E5BE07-9BCF-46D8-8A8E-1410F16CE208}"
 EndProject
@@ -12,6 +12,13 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoodHamburger.Infrastructure", "GoodHamburger.Infrastructure\GoodHamburger.Infrastructure.csproj", "{2E4BF6E0-1883-4C7A-B44F-4C82EB9984DA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoodHamburger.API", "GoodHamburger.API\GoodHamburger.API.csproj", "{78F7BDBE-DCDD-4FE7-A09B-037ED8348668}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SQL", "SQL", "{FD862AEF-FBB3-4B56-B40E-46BA77EC044D}"
+	ProjectSection(SolutionItems) = preProject
+		Database.sql = Database.sql
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoodHamburger.Tests", "GoodHamburger.Tests\GoodHamburger.Tests.csproj", "{6F1005D1-A8F1-4D82-B07E-34121CD2FC2D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,6 +42,10 @@ Global
 		{78F7BDBE-DCDD-4FE7-A09B-037ED8348668}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{78F7BDBE-DCDD-4FE7-A09B-037ED8348668}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{78F7BDBE-DCDD-4FE7-A09B-037ED8348668}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F1005D1-A8F1-4D82-B07E-34121CD2FC2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F1005D1-A8F1-4D82-B07E-34121CD2FC2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F1005D1-A8F1-4D82-B07E-34121CD2FC2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F1005D1-A8F1-4D82-B07E-34121CD2FC2D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -44,6 +55,7 @@ Global
 		{11F24F85-3667-4EE8-AEAE-580071852826} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{2E4BF6E0-1883-4C7A-B44F-4C82EB9984DA} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{78F7BDBE-DCDD-4FE7-A09B-037ED8348668} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{6F1005D1-A8F1-4D82-B07E-34121CD2FC2D} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {471E3473-ED13-4DCC-B5D9-71795CAD0C82}

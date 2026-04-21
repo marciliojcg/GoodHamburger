@@ -1,12 +1,31 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using GoodHamburger.Application.UseCases;
+using Microsoft.AspNetCore.Mvc;
 
-namespace GoodHamburger.API.Controllers
+namespace GoodHamburger.API.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class CardapioController : ControllerBase
 {
-    public class CardapioController : Controller
+    private readonly CardapioUseCases _cardapioUseCases;
+
+    public CardapioController(CardapioUseCases cardapioUseCases)
     {
-        public IActionResult Index()
+        _cardapioUseCases = cardapioUseCases;
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> ObterCardapio()
+    {
+        try
         {
-            return View();
+            var cardapio = await _cardapioUseCases.ObterCardapioAsync();
+            return Ok(cardapio);
         }
+        catch (Exception ex)
+        {
+            return BadRequest(new { erro = ex.Message });
+        }
+    
     }
 }
