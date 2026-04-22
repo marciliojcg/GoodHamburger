@@ -10,9 +10,9 @@ public class Pedido
     public DateTime? DataAtualizacao { get; set; }
     public string Status { get; set; }
     public List<ItemPedido> Itens { get; set; }
-    public decimal Subtotal { get; private set; }
-    public decimal Desconto { get; private set; }
-    public decimal Total { get; private set; }
+    public decimal Subtotal { get;  set; }
+    public decimal Desconto { get;  set; }
+    public decimal Total { get;  set; }
 
     public void CalcularTotais()
     {
@@ -39,15 +39,15 @@ public class Pedido
 
     public void ValidarItensDuplicados()
     {
-        var sanduiches = Itens.Count(i => i.Tipo == TipoItem.Sanduiche);
-        var batatas = Itens.Count(i => i.Nome == "Batata frita");
-        var refrigerantes = Itens.Count(i => i.Nome == "Refrigerante");
+        var sanduiches = Itens.Count(i => i.Tipo == TipoItem.Sanduiche && i.Quantidade > 1);
+        var batatas = Itens.Count(i => i.Nome == "Batata frita" && i.Quantidade > 1);
+        var refrigerantes = Itens.Count(i => i.Nome == "Refrigerante" && i.Quantidade > 1);
 
-        if (sanduiches > 1)
+        if (sanduiches > 0)
             throw new DomainException("Cada pedido pode conter apenas um sanduíche");
-        if (batatas > 1)
+        if (batatas > 0)
             throw new DomainException("Cada pedido pode conter apenas uma batata frita");
-        if (refrigerantes > 1)
+        if (refrigerantes > 0)
             throw new DomainException("Cada pedido pode conter apenas um refrigerante");
     }
 }

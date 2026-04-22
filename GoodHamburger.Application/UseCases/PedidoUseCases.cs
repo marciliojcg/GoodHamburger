@@ -31,6 +31,8 @@ public class PedidoUseCases
         pedido.ValidarItensDuplicados();
         pedido.CalcularTotais();
 
+        var teste = pedido;
+
         var pedidoCriado = await _pedidoRepository.CriarAsync(pedido);
         return MapToResponse(pedidoCriado);
     }

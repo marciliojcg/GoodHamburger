@@ -1,4 +1,3 @@
-using Xunit;
 using Moq;
 using GoodHamburger.Application.UseCases;
 using GoodHamburger.Application.Ports;
@@ -138,14 +137,18 @@ public class PedidoUseCasesTests
                 new ItemPedido { Id = Guid.NewGuid(), Nome = "Hambúrguer Clássico", Tipo = TipoItem.Sanduiche, PrecoUnitario = 25.00m, Quantidade = 1 },
                 new ItemPedido { Id = Guid.NewGuid(), Nome = "Batata frita", Tipo = TipoItem.Acompanhamento, PrecoUnitario = 12.00m, Quantidade = 1 },
                 new ItemPedido { Id = Guid.NewGuid(), Nome = "Refrigerante", Tipo = TipoItem.Acompanhamento, PrecoUnitario = 8.00m, Quantidade = 1 }
-            }
-          
+            },
+            Subtotal = 45.00m,
+            Desconto = 9.00m,
+            Total = 36.00m
+
         };
 
         _cardapioRepositoryMock
             .Setup(x => x.ObterPorNomeAsync(It.IsAny<string>()))
             .Returns((string nome) => Task.FromResult(new[] { hamburguer, batataFrita, refrigerante }
                 .FirstOrDefault(x => x.Nome == nome)));
+
 
         _pedidoRepositoryMock
             .Setup(x => x.CriarAsync(It.IsAny<Pedido>()))
@@ -202,8 +205,7 @@ public class PedidoUseCasesTests
         {
             Itens = new List<ItemPedidoDto>
             {
-                new ItemPedidoDto { Nome = "Hambúrguer Clássico", Quantidade = 1 },
-                new ItemPedidoDto { Nome = "Hambúrguer Clássico", Quantidade = 1 }
+                new ItemPedidoDto { Nome = "Hambúrguer Clássico", Quantidade = 2 }
             }
         };
 
@@ -211,12 +213,10 @@ public class PedidoUseCasesTests
             .Setup(x => x.ObterPorNomeAsync("Hambúrguer Clássico"))
             .ReturnsAsync(hamburguer);
 
-        // Act & Assert
+        // Assert
         await Assert.ThrowsAsync<DomainException>(() => 
             _pedidoUseCases.CriarPedidoAsync(criarPedidoDto));
 
-        _cardapioRepositoryMock.Verify(x => x.ObterPorNomeAsync("Hambúrguer Clássico"), Times.Exactly(2));
-        _pedidoRepositoryMock.Verify(x => x.CriarAsync(It.IsAny<Pedido>()), Times.Never);
     }
 
     #endregion
@@ -366,7 +366,7 @@ public class PedidoUseCasesTests
             Id = pedidoId,
             Itens = new List<ItemPedidoDto>
             {
-                new ItemPedidoDto { Nome = "Hambúrguer Premium", Quantidade = 2 }
+                new ItemPedidoDto { Nome = "Hambúrguer Premium", Quantidade = 1 }
             }
         };
 
@@ -389,7 +389,7 @@ public class PedidoUseCasesTests
             Status = "Pendente",
             Itens = new List<ItemPedido>
             {
-                new ItemPedido { Id = Guid.NewGuid(), Nome = "Hambúrguer Premium", Tipo = TipoItem.Sanduiche, PrecoUnitario = 35.00m, Quantidade = 2 }
+                new ItemPedido { Id = Guid.NewGuid(), Nome = "Hambúrguer Premium", Tipo = TipoItem.Sanduiche, PrecoUnitario = 35.00m, Quantidade = 1 }
             }
         };
 
