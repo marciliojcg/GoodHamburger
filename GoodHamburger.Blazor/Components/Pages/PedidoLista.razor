@@ -1,0 +1,139 @@
+﻿@page "/pedidos"
+@using GoodHamburger.Blazor.Models
+@using GoodHamburger.Blazor.Services
+@using GoodHamburger.Blazor.Services.Interfaces
+@inject IPedidoService PedidoService
+@inject NavigationManager Navigation
+
+<h2 class="mb-4">📋 Lista de Pedidos</h2>
+
+@if (pedidos == null)
+{
+    <div class="text-center">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Carregando...</span>
+        </div>
+    </div>
+}
+else if (!pedidos.Any())
+{
+    <div class="alert alert-info">
+        Nenhum pedido encontrado.
+        <a href="/pedido/novo" class="alert-link">Clique aqui para criar um novo pedido</a>
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Data</th>
+                    <th>Itens</th>
+                    <th>Subtotal</th>
+                    <th>Desconto</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var pedido in pedidos)
+                {
+                    <tr>
+                        <td>
+                            <small class="text-muted">@pedido.Id.ToString().Substring(0, 8)...</small>
+                        </td>
+                        <td>@pedido.DataCriacao.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>
+                            @foreach (var item in pedido.Itens)
+                            {
+                                <span class="badge bg-secondary me-1">
+                                    @item.Nome (x@item.Quantidade)
+                                </span>
+                            }
+                        </td>
+                        <td class="text-end">R$ @pedido.Subtotal.ToString("F2")</td>
+                        <td class="text-end text-success">-R$ @pedido.Desconto.ToString("F2")</td>
+                        <td class="text-end fw-bold">R$ @pedido.Total.ToString("F2")</td>
+                        <td>
+                            <span class="badge bg-@GetStatusColor(pedido.Status)">
+                                @pedido.Status
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-primary me-1"
+                                    @onclick="() => EditarPedido(pedido.Id)">
+                                <i class="bi bi-pencil"></i> Editar
+                            </button>
+                            <button class="btn btn-sm btn-danger"
+                                    @onclick="() => ExcluirPedido(pedido.Id)">
+                                <i class="bi bi-trash"></i> Excluir
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<div class="mt-3">
+    <a href="/pedido/novo" class="btn btn-success">
+        <i class="bi bi-plus-circle"></i> Novo Pedido
+    </a>
+</div>
+
+@code {
+    private List<PedidoResponse> pedidos = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CarregarPedidos();
+    }
+
+    private async Task CarregarPedidos()
+    {
+        pedidos = await PedidoService.GetPedidosAsync();
+        StateHasChanged();
+    }
+
+    private void EditarPedido(Guid id)
+    {
+        Navigation.NavigateTo($"/pedido/editar/{id}");
+    }
+
+    private async Task ExcluirPedido(Guid id)
+    {
+        var confirm = await JS.InvokeAsync<bool>("confirm", $"Deseja realmente excluir o pedido {id.ToString().Substring(0, 8)}?");
+
+        if (confirm)
+        {
+            var success = await PedidoService.DeletePedidoAsync(id);
+            if (success)
+            {
+                await CarregarPedidos();
+            }
+            else
+            {
+                await JS.InvokeVoidAsync("alert", "Erro ao excluir o pedido");
+            }
+        }
+    }
+
+    private string GetStatusColor(string status)
+    {
+        return status switch
+        {
+            "Pendente" => "warning",
+            "Confirmado" => "info",
+            "Entregue" => "success",
+            "Cancelado" => "danger",
+            _ => "secondary"
+        };
+    }
+
+    [Inject]
+    protected IJSRuntime JS { get; set; }
+}
