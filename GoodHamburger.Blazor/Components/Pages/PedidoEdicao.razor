@@ -39,7 +39,7 @@ else
                         <div class="row">
                             <div class="col-md-6">
                                 <label class="form-label">Tipo de Sanduíche</label>
-                                <select class="form-select" @bind="sanduicheSelecionado">
+                                <select class="form-select" @bind="sanduicheSelecionado" >
                                     <option value="">Selecione um sanduíche...</option>
                                     @foreach (var sanduiche in sanduiches)
                                     {
@@ -59,7 +59,7 @@ else
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label">Acompanhamento 1</label>
-                                <select class="form-select" @bind="acompanhamento1Selecionado">
+                                <select class="form-select" @bind="acompanhamento1Selecionado" >
                                     <option value="">Selecione um acompanhamento...</option>
                                     @foreach (var item in acompanhamentos)
                                     {
@@ -69,13 +69,13 @@ else
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Quantidade</label>
-                                <input type="number" class="form-control" @bind="quantidadeAcompanhamento1" min="0" max="10" />
+                                <input type="number" class="form-control" @bind="quantidadeAcompanhamento1"  min="0" max="10" />
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
                                 <label class="form-label">Acompanhamento 2</label>
-                                <select class="form-select" @bind="acompanhamento2Selecionado">
+                                <select class="form-select" @bind="acompanhamento2Selecionado" >
                                     <option value="">Selecione um acompanhamento...</option>
                                     @foreach (var item in acompanhamentos)
                                     {
@@ -100,10 +100,10 @@ else
                     </div>
 
                     <div class="d-flex justify-content-between mt-3">
-                        <button class="btn btn-secondary" @onclick="Cancelar">
+                        <button class="btn btn-secondary" @onclick="Cancelar" type="button">
                             <i class="bi bi-x-circle"></i> Cancelar
                         </button>
-                        <button class="btn btn-primary" @onclick="AtualizarPedido" disabled="@(!PedidoValido())">
+                        <button class="btn btn-primary" @onclick="AtualizarPedido" disabled="@(!PedidoValido())" type="button">
                             <i class="bi bi-save"></i> Atualizar Pedido
                         </button>
                     </div>
@@ -132,7 +132,7 @@ else
                                 <strong>Subtotal:</strong>
                                 <span>R$ @subtotal.ToString("F2")</span>
                             </div>
-                            <div class="d-flex justify-between text-success">
+                            <div class="d-flex justify-content-between text-success">
                                 <strong>Desconto:</strong>
                                 <span>-R$ @desconto.ToString("F2")</span>
                             </div>
@@ -155,7 +155,7 @@ else
     </div>
 }
 
-@code {
+@* @code {
     [Parameter] public Guid id { get; set; }
 
     private bool carregando = true;
@@ -331,4 +331,4 @@ else
         Navigation.NavigateTo("/pedidos");
     }
 
-}
+} *@

@@ -66,11 +66,13 @@ else
                         </td>
                         <td>
                             <button class="btn btn-sm btn-primary me-1"
-                                    @onclick="() => EditarPedido(pedido.Id)">
+                                    @onclick="() => EditarPedido(pedido.Id)"
+                                    type="button">
                                 <i class="bi bi-pencil"></i> Editar
                             </button>
                             <button class="btn btn-sm btn-danger"
-                                    @onclick="() => ExcluirPedido(pedido.Id)">
+                                    @onclick="() => ExcluirPedido(pedido.Id)"
+                                    type="button">
                                 <i class="bi bi-trash"></i> Excluir
                             </button>
                         </td>
@@ -87,52 +89,3 @@ else
     </a>
 </div>
 
-@code {
-    private List<PedidoResponse> pedidos = new();
-
-    protected override async Task OnInitializedAsync()
-    {
-        await CarregarPedidos();
-    }
-
-    private async Task CarregarPedidos()
-    {
-        pedidos = await PedidoService.GetPedidosAsync();
-        StateHasChanged();
-    }
-
-    private void EditarPedido(Guid id)
-    {
-        Navigation.NavigateTo($"/pedido/editar/{id}");
-    }
-
-    private async Task ExcluirPedido(Guid id)
-    {
-        var confirm = await JS.InvokeAsync<bool>("confirm", $"Deseja realmente excluir o pedido {id.ToString().Substring(0, 8)}?");
-
-        if (confirm)
-        {
-            var success = await PedidoService.DeletePedidoAsync(id);
-            if (success)
-            {
-                await CarregarPedidos();
-            }
-            else
-            {
-                await JS.InvokeVoidAsync("alert", "Erro ao excluir o pedido");
-            }
-        }
-    }
-
-    private string GetStatusColor(string status)
-    {
-        return status switch
-        {
-            "Pendente" => "warning",
-            "Confirmado" => "info",
-            "Entregue" => "success",
-            "Cancelado" => "danger",
-            _ => "secondary"
-        };
-    }
-}
