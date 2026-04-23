@@ -1,7 +1,6 @@
 using GoodHamburger.Blazor.Components;
 using GoodHamburger.Blazor.Services;
 using GoodHamburger.Blazor.Services.Interfaces;
-using Microsoft.AspNetCore.Components.Web;
 
 namespace GoodHamburger.Blazor;
 
@@ -20,8 +19,15 @@ public class Program
         builder.Services.AddScoped<IPedidoService, PedidoService>();
         builder.Services.AddScoped<ICardapioService, CardapioService>();
 
-        // Configurar HttpClient
-        builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.Configuration["ApiBaseAddress"] ?? "https://localhost:5001") });
+        // Configurar HttpClient corretamente
+        builder.Services.AddHttpClient();
+        builder.Services.AddScoped(sp => 
+        {
+            var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
+            var httpClient = httpClientFactory.CreateClient();
+            httpClient.BaseAddress = new Uri(builder.Configuration["ApiBaseAddress"] ?? "https://localhost:5001");
+            return httpClient;
+        });
 
         var app = builder.Build();
 
@@ -29,7 +35,6 @@ public class Program
         if (!app.Environment.IsDevelopment())
         {
             app.UseExceptionHandler("/Error");
-            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
             app.UseHsts();
         }
 

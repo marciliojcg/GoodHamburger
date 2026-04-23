@@ -1,0 +1,334 @@
+﻿@page "/pedido/editar/{id:guid}"
+@rendermode InteractiveServer
+@using GoodHamburger.Blazor.Models
+@using GoodHamburger.Blazor.Services
+@using GoodHamburger.Blazor.Services.Interfaces
+@inject IPedidoService PedidoService
+@inject ICardapioService CardapioService
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+
+<h2 class="mb-4">✏️ Editar Pedido</h2>
+
+@if (carregando)
+{
+    <div class="text-center">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Carregando...</span>
+        </div>
+    </div>
+}
+else if (pedido == null)
+{
+    <div class="alert alert-danger">
+        Pedido não encontrado!
+        <a href="/pedidos" class="alert-link">Voltar para lista</a>
+    </div>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning">
+                    <h5 class="mb-0">Editar Pedido #@pedido.Id.ToString().Substring(0, 8)</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h6 class="fw-bold">🍔 Sanduíche</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label">Tipo de Sanduíche</label>
+                                <select class="form-select" @bind="sanduicheSelecionado">
+                                    <option value="">Selecione um sanduíche...</option>
+                                    @foreach (var sanduiche in sanduiches)
+                                    {
+                                        <option value="@sanduiche.Nome">@sanduiche.Nome - R$ @sanduiche.Preco.ToString("F2")</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Quantidade</label>
+                                <input type="number" class="form-control" @bind="quantidadeSanduiche" min="1" max="10" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h6 class="fw-bold">🍟 Acompanhamentos</h6>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Acompanhamento 1</label>
+                                <select class="form-select" @bind="acompanhamento1Selecionado">
+                                    <option value="">Selecione um acompanhamento...</option>
+                                    @foreach (var item in acompanhamentos)
+                                    {
+                                        <option value="@item.Nome">@item.Nome - R$ @item.Preco.ToString("F2")</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Quantidade</label>
+                                <input type="number" class="form-control" @bind="quantidadeAcompanhamento1" min="0" max="10" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label">Acompanhamento 2</label>
+                                <select class="form-select" @bind="acompanhamento2Selecionado">
+                                    <option value="">Selecione um acompanhamento...</option>
+                                    @foreach (var item in acompanhamentos)
+                                    {
+                                        <option value="@item.Nome">@item.Nome - R$ @item.Preco.ToString("F2")</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Quantidade</label>
+                                <input type="number" class="form-control" @bind="quantidadeAcompanhamento2" min="0" max="10" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <strong>💡 Regras de Desconto:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>Sanduíche + Batata + Refrigerante → 20% de desconto</li>
+                            <li>Sanduíche + Refrigerante → 15% de desconto</li>
+                            <li>Sanduíche + Batata → 10% de desconto</li>
+                        </ul>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-3">
+                        <button class="btn btn-secondary" @onclick="Cancelar">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </button>
+                        <button class="btn btn-primary" @onclick="AtualizarPedido" disabled="@(!PedidoValido())">
+                            <i class="bi bi-save"></i> Atualizar Pedido
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">📊 Resumo do Pedido</h5>
+                </div>
+                <div class="card-body">
+                    <div id="resumo-pedido">
+                        @if (itensPedido.Any())
+                        {
+                            @foreach (var item in itensPedido)
+                            {
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>@item.Nome | Quantidade: @item.Quantidade</span>
+                                    <span>R$ @CalcularSubtotalItem(item).ToString("F2")</span>
+                                </div>
+                            }
+                            <hr />
+                            <div class="d-flex justify-content-between">
+                                <strong>Subtotal:</strong>
+                                <span>R$ @subtotal.ToString("F2")</span>
+                            </div>
+                            <div class="d-flex justify-between text-success">
+                                <strong>Desconto:</strong>
+                                <span>-R$ @desconto.ToString("F2")</span>
+                            </div>
+                            <hr />
+                            <div class="d-flex justify-content-between fw-bold">
+                                <strong>Total:</strong>
+                                <span class="text-primary">R$ @total.ToString("F2")</span>
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted text-center mb-0">
+                                Selecione os itens do pedido
+                            </p>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public Guid id { get; set; }
+
+    private bool carregando = true;
+    private PedidoResponse pedido;
+    private List<CardapioItemResponse> sanduiches = new();
+    private List<CardapioItemResponse> acompanhamentos = new();
+
+    private string sanduicheSelecionado = "";
+    private int quantidadeSanduiche = 1;
+
+    private string acompanhamento1Selecionado = "";
+    private int quantidadeAcompanhamento1 = 0;
+
+    private string acompanhamento2Selecionado = "";
+    private int quantidadeAcompanhamento2 = 0;
+
+    private List<ItemPedidoRequest> itensPedido = new();
+    private decimal subtotal = 0;
+    private decimal desconto = 0;
+    private decimal total = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CarregarCardapio();
+        await CarregarPedido();
+        CarregarDadosPedido();
+        carregando = false;
+    }
+
+    private async Task CarregarCardapio()
+    {
+        sanduiches = await CardapioService.GetSanduichesAsync();
+        acompanhamentos = await CardapioService.GetAcompanhamentosAsync();
+    }
+
+    private async Task CarregarPedido()
+    {
+        pedido = await PedidoService.GetPedidoByIdAsync(id);
+    }
+
+    private void CarregarDadosPedido()
+    {
+        if (pedido == null) return;
+
+        var itemSanduiche = pedido.Itens.FirstOrDefault(i => sanduiches.Any(s => s.Nome == i.Nome));
+        if (itemSanduiche != null)
+        {
+            sanduicheSelecionado = itemSanduiche.Nome;
+            quantidadeSanduiche = itemSanduiche.Quantidade;
+        }
+
+        var acompanhamentosPedido = pedido.Itens.Where(i => acompanhamentos.Any(a => a.Nome == i.Nome)).ToList();
+
+        if (acompanhamentosPedido.Count > 0)
+        {
+            acompanhamento1Selecionado = acompanhamentosPedido[0].Nome;
+            quantidadeAcompanhamento1 = acompanhamentosPedido[0].Quantidade;
+        }
+
+        if (acompanhamentosPedido.Count > 1)
+        {
+            acompanhamento2Selecionado = acompanhamentosPedido[1].Nome;
+            quantidadeAcompanhamento2 = acompanhamentosPedido[1].Quantidade;
+        }
+
+        CalcularResumo();
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (!carregando)
+            CalcularResumo();
+    }
+
+    private void CalcularResumo()
+    {
+        itensPedido.Clear();
+
+        if (!string.IsNullOrEmpty(sanduicheSelecionado) && quantidadeSanduiche > 0)
+        {
+            itensPedido.Add(new ItemPedidoRequest
+            {
+                Nome = sanduicheSelecionado,
+                Quantidade = quantidadeSanduiche
+            });
+        }
+
+        if (!string.IsNullOrEmpty(acompanhamento1Selecionado) && quantidadeAcompanhamento1 > 0)
+        {
+            itensPedido.Add(new ItemPedidoRequest
+            {
+                Nome = acompanhamento1Selecionado,
+                Quantidade = quantidadeAcompanhamento1
+            });
+        }
+
+        if (!string.IsNullOrEmpty(acompanhamento2Selecionado) && quantidadeAcompanhamento2 > 0)
+        {
+            itensPedido.Add(new ItemPedidoRequest
+            {
+                Nome = acompanhamento2Selecionado,
+                Quantidade = quantidadeAcompanhamento2
+            });
+        }
+
+        subtotal = 0;
+        foreach (var item in itensPedido)
+        {
+            subtotal += CalcularSubtotalItem(item);
+        }
+
+        var temSanduiche = itensPedido.Any(i => sanduiches.Any(s => s.Nome == i.Nome));
+        var temBatata = itensPedido.Any(i => i.Nome == "Batata frita");
+        var temRefrigerante = itensPedido.Any(i => i.Nome == "Refrigerante");
+
+        if (temSanduiche && temBatata && temRefrigerante)
+            desconto = subtotal * 0.20m;
+        else if (temSanduiche && temRefrigerante)
+            desconto = subtotal * 0.15m;
+        else if (temSanduiche && temBatata)
+            desconto = subtotal * 0.10m;
+        else
+            desconto = 0;
+
+        total = subtotal - desconto;
+    }
+
+    private decimal CalcularSubtotalItem(ItemPedidoRequest item)
+    {
+        var sanduiche = sanduiches.FirstOrDefault(s => s.Nome == item.Nome);
+        if (sanduiche != null)
+            return sanduiche.Preco * item.Quantidade;
+
+        var acompanhamento = acompanhamentos.FirstOrDefault(a => a.Nome == item.Nome);
+        if (acompanhamento != null)
+            return acompanhamento.Preco * item.Quantidade;
+
+        return 0;
+    }
+
+    private bool PedidoValido()
+    {
+        return !string.IsNullOrEmpty(sanduicheSelecionado) && quantidadeSanduiche > 0;
+    }
+
+    private async Task AtualizarPedido()
+    {   
+        CalcularResumo();
+
+        var request = new AtualizarPedidoRequest
+        {
+            Id = id,
+            Itens = itensPedido.Where(i => i.Quantidade > 0).ToList()
+        };
+
+        try
+        {
+            var pedidoAtualizado = await PedidoService.UpdatePedidoAsync(request);
+            if (pedidoAtualizado != null)
+            {
+                await JS.InvokeVoidAsync("alert", "Pedido atualizado com sucesso!");
+                Navigation.NavigateTo("/pedidos");
+            }
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("alert", $"Erro ao atualizar pedido: {ex.Message}");
+        }
+    }
+
+    private void Cancelar()
+    {
+        Navigation.NavigateTo("/pedidos");
+    }
+
+}

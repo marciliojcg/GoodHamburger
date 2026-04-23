@@ -1,6 +1,5 @@
 ﻿using GoodHamburger.Blazor.Models;
 using GoodHamburger.Blazor.Services.Interfaces;
-using System.Net.Http.Json;
 
 namespace GoodHamburger.Blazor.Services;
 
@@ -14,8 +13,8 @@ public class CardapioService : ICardapioService
     {
         _httpClient = httpClient;
         _configuration = configuration;
-        _apiUrl = _configuration["ApiSettings:BaseUrl"] ?? "https://localhost:7000";
-        _httpClient.BaseAddress = new Uri(_apiUrl);
+        //_apiUrl = _configuration["ApiBaseAddress"] ?? "https://localhost:7089";
+        //_httpClient.BaseAddress = new Uri(_apiUrl);
     }
 
     public async Task<List<CardapioItemResponse>> GetCardapioAsync()

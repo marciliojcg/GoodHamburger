@@ -1,9 +1,11 @@
 ﻿@page "/pedidos"
+@rendermode InteractiveServer
 @using GoodHamburger.Blazor.Models
 @using GoodHamburger.Blazor.Services
 @using GoodHamburger.Blazor.Services.Interfaces
 @inject IPedidoService PedidoService
 @inject NavigationManager Navigation
+@inject IJSRuntime JS
 
 <h2 class="mb-4">📋 Lista de Pedidos</h2>
 
@@ -43,14 +45,14 @@ else
                 {
                     <tr>
                         <td>
-                            <small class="text-muted">@pedido.Id.ToString().Substring(0, 8)...</small>
+                            <small class="text-muted">@pedido.Id.ToString()</small>
                         </td>
                         <td>@pedido.DataCriacao.ToString("dd/MM/yyyy HH:mm")</td>
                         <td>
                             @foreach (var item in pedido.Itens)
                             {
                                 <span class="badge bg-secondary me-1">
-                                    @item.Nome (x@item.Quantidade)
+                                    @item.Nome | Quantidade : @item.Quantidade
                                 </span>
                             }
                         </td>
@@ -133,7 +135,4 @@ else
             _ => "secondary"
         };
     }
-
-    [Inject]
-    protected IJSRuntime JS { get; set; }
 }
