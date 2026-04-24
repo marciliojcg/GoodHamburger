@@ -1,4 +1,5 @@
 using GoodHamburger.Blazor.Models;
+using GoodHamburger.Blazor.Services.Interfaces;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
@@ -6,7 +7,8 @@ namespace GoodHamburger.Blazor.Components.Pages;
 
 public partial class PedidoCadastro
 {
-
+    [Inject]
+    private IPedidoValidationService PedidoValidationService { get; set; } = default!;
 
     private bool carregando = true;
     private List<CardapioItemResponse> sanduiches = new();
@@ -43,29 +45,6 @@ public partial class PedidoCadastro
         {
             await JS.InvokeVoidAsync("console.error", $"Erro ao carregar cardápio: {ex.Message}");
         }
-    }
-
-    private void AoMudarSanduiche(ChangeEventArgs e)
-    {
-        sanduicheSelecionado = e.Value?.ToString() ?? "";
-        CalcularResumo();
-    }
-
-    private void AoMudarAcompanhamento1(ChangeEventArgs e)
-    {
-        acompanhamento1Selecionado = e.Value?.ToString() ?? "";
-        CalcularResumo();
-    }
-
-    private void AoMudarAcompanhamento2(ChangeEventArgs e)
-    {
-        acompanhamento2Selecionado = e.Value?.ToString() ?? "";
-        CalcularResumo();
-    }
-
-    private void AoMudarQuantidade(ChangeEventArgs e)
-    {
-        CalcularResumo();
     }
 
     private void CalcularResumo()
@@ -141,7 +120,16 @@ public partial class PedidoCadastro
     }
 
     private async Task SalvarPedido()
-    {
+    {   
+        if (!await PedidoValidationService.ValidarPedidoAsync(
+            sanduicheSelecionado,
+            quantidadeSanduiche,
+            acompanhamento1Selecionado,
+            quantidadeAcompanhamento1,
+            acompanhamento2Selecionado,
+            quantidadeAcompanhamento2))
+            return;
+
         CalcularResumo();
 
         var request = new CriarPedidoRequest

@@ -1,4 +1,5 @@
 using GoodHamburger.Blazor.Models;
+using GoodHamburger.Blazor.Services.Interfaces;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
@@ -6,6 +7,9 @@ namespace GoodHamburger.Blazor.Components.Pages;
 
 public partial class PedidoEdicao
 {
+    [Inject]
+    private IPedidoValidationService PedidoValidationService { get; set; } = default!;
+
     [Parameter]
     public Guid id { get; set; }
 
@@ -95,29 +99,6 @@ public partial class PedidoEdicao
             CalcularResumo();
     }
 
-    private void AoMudarSanduiche(ChangeEventArgs e)
-    {
-        sanduicheSelecionado = e.Value?.ToString() ?? "";
-        CalcularResumo();
-    }
-
-    private void AoMudarAcompanhamento1(ChangeEventArgs e)
-    {
-        acompanhamento1Selecionado = e.Value?.ToString() ?? "";
-        CalcularResumo();
-    }
-
-    private void AoMudarAcompanhamento2(ChangeEventArgs e)
-    {
-        acompanhamento2Selecionado = e.Value?.ToString() ?? "";
-        CalcularResumo();
-    }
-
-    private void AoMudarQuantidade(ChangeEventArgs e)
-    {
-        CalcularResumo();
-    }
-
     private void CalcularResumo()
     {
         itensPedido.Clear();
@@ -191,6 +172,15 @@ public partial class PedidoEdicao
 
     private async Task AtualizarPedido()
     {
+        if (!await PedidoValidationService.ValidarPedidoAsync(
+            sanduicheSelecionado,
+            quantidadeSanduiche,
+            acompanhamento1Selecionado,
+            quantidadeAcompanhamento1,
+            acompanhamento2Selecionado,
+            quantidadeAcompanhamento2))
+            return;
+
         CalcularResumo();
 
         var request = new AtualizarPedidoRequest

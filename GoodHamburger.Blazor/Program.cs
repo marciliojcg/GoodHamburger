@@ -18,6 +18,7 @@ public class Program
         // Registrar serviços
         builder.Services.AddScoped<IPedidoService, PedidoService>();
         builder.Services.AddScoped<ICardapioService, CardapioService>();
+        builder.Services.AddScoped<IPedidoValidationService, PedidoValidationService>();
 
         // Configurar HttpClient corretamente
         builder.Services.AddHttpClient();
